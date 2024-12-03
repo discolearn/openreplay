@@ -895,6 +895,10 @@ class CardSeriesSchema(BaseModel):
 class MetricTimeseriesViewType(str, Enum):
     LINE_CHART = "lineChart"
     AREA_CHART = "areaChart"
+    BAR_CHART = "barChart"
+    PIE_CHART = "pieChart"
+    PROGRESS_CHART = "progressChart"
+    TABLE_CHART = "table"
 
 
 class MetricTableViewType(str, Enum):

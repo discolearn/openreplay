@@ -188,7 +188,7 @@ def search2_series(data: schemas.SessionsSearchPayloadSchema, project_id: int, d
     sessions = []
     with pg_client.PostgresClient() as cur:
         if metric_type == schemas.MetricType.TIMESERIES:
-            if view_type == schemas.MetricTimeseriesViewType.LINE_CHART:
+            if view_type in schemas.MetricTimeseriesViewType: #== schemas.MetricTimeseriesViewType.LINE_CHART:
                 if metric_of == schemas.MetricOfTimeseries.SESSION_COUNT:
                     # main_query = cur.mogrify(f"""WITH full_sessions AS (SELECT DISTINCT ON(s.session_id) s.session_id, s.start_ts
                     main_query = cur.mogrify(f"""WITH full_sessions AS (SELECT s.session_id, s.start_ts
@@ -234,7 +234,7 @@ def search2_series(data: schemas.SessionsSearchPayloadSchema, project_id: int, d
                 logger.warning(data.model_dump_json())
                 logger.warning("--------------------")
                 raise err
-            if view_type == schemas.MetricTimeseriesViewType.LINE_CHART:
+            if view_type in schemas.MetricTimeseriesViewType: #== schemas.MetricTimeseriesViewType.LINE_CHART:
                 sessions = cur.fetchall()
             else:
                 sessions = cur.fetchone()["count"]
