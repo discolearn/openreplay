@@ -899,6 +899,7 @@ class MetricTimeseriesViewType(str, Enum):
     PIE_CHART = "pieChart"
     PROGRESS_CHART = "progressChart"
     TABLE_CHART = "table"
+    METRIC_CHART = "metric"
 
 
 class MetricTableViewType(str, Enum):
