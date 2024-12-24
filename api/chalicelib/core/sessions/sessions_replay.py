@@ -62,6 +62,8 @@ def get_replay(project_id, session_id, context: schemas.CurrentContext, full_dat
                     data['mobsUrl'] = []
                     data['videoURL'] = sessions_mobs.get_mobile_videos(session_id=session_id, project_id=project_id,
                                                                        check_existence=False)
+                    data['devtoolsURL'] = sessions_devtool.get_urls(session_id=session_id, project_id=project_id,
+                                                                    context=context, check_existence=False)
                 else:
                     data['mobsUrl'] = sessions_mobs.get_urls_depercated(session_id=session_id, check_existence=False)
                     data['devtoolsURL'] = sessions_devtool.get_urls(session_id=session_id, project_id=project_id,
