@@ -286,7 +286,7 @@ export default class IOSMessageManager implements IMessageManager {
         // @ts-ignore
         this.lists.lists.log.append(Log(log));
         break;
-      case MType.GraphQl:
+      case MType.MobileGraphQl:
         this.lists.lists.graphql.insert(msg);
         break;
       default:
