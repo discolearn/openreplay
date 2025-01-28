@@ -214,7 +214,10 @@ export default class MessageLoader {
   }
 
   preloaded = false;
-  async preloadFirstFile(data: Uint8Array) {
+  async preloadFirstFile(data: Uint8Array, fileKey?: string) {
+    if (fileKey) {
+      this.session.fileKey = fileKey;
+    }
     this.mobParser = this.createNewParser(true, this.processMessages, 'p:dom');
 
     try {

@@ -34,6 +34,9 @@ const unpack = (b: Uint8Array): Uint8Array => {
     );
     data = uData;
   }
+  if (!isGzip && !isZstd) {
+    console.debug('No unpacking needed', Math.floor(b.byteLength / 1024) + 'kb');
+  }
   return data;
 };
 
