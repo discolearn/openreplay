@@ -371,17 +371,22 @@ export default class API {
   }
 
   /**
+   * @param {Object} options - to control batching:
+   * - throttleBatchSize - number of messages to send in one batch; default 10_000
+   * - throttleDelay - delay between batches; default 10ms
    * Uploads the stored session buffer to backend
    * @returns promise that resolves once messages are loaded, it has to be awaited
    * so the session can be uploaded properly
    * @resolve - if messages were loaded into service worker successfully
    * @reject {string} - error message
-   * */
-  uploadOfflineRecording() {
+   * @param options
+   **/
+  uploadOfflineRecording(options: { throttleBatchSize?: number; throttleDelay?: number }) {
+    const { throttleBatchSize = 10000, throttleDelay = 10 } = options
     if (this.app === null) {
       return
     }
-    return this.app.uploadOfflineRecording()
+    return this.app.uploadOfflineRecording({ throttleBatchSize, throttleDelay })
   }
 
   stop(): string | undefined {

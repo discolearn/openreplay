@@ -1295,7 +1295,10 @@ export default class App {
    * @resolve - if messages were loaded in service worker successfully
    * @reject {string} - error message
    * */
-  public async uploadOfflineRecording() {
+  public async uploadOfflineRecording({
+    throttleBatchSize = 10000,
+    throttleDelay = 10,
+  }: { throttleBatchSize?: number; throttleDelay?: number } = {}): Promise<void> {
     this.stop(false)
     const timestamp = now()
     this.worker?.postMessage({
@@ -1351,7 +1354,11 @@ export default class App {
       userState,
     })
     while (this.bufferedMessages1.length > 0) {
-      await this.flushBuffer(this.bufferedMessages1)
+      await this.flushBuffer({
+        buffer: this.bufferedMessages1,
+        throttleBatchSize,
+        throttleDelay,
+      })
     }
     this.postToWorker([['q_end']] as unknown as Message[])
     this.clearBuffers()
@@ -1564,7 +1571,7 @@ export default class App {
             ? this.bufferedMessages1
             : this.bufferedMessages2
         while (biggestBuffer.length > 0) {
-          await this.flushBuffer(biggestBuffer)
+          await this.flushBuffer({ buffer: biggestBuffer })
         }
         this.clearBuffers()
         this.commit()
@@ -1636,21 +1643,33 @@ export default class App {
     this.canvasRecorder?.restartTracking()
   }
 
-  flushBuffer = async (buffer: Message[]) => {
-    return new Promise((res) => {
-      let ended = false
-      const messagesBatch: Message[] = [buffer.shift() as unknown as Message]
-      while (!ended) {
-        const nextMsg = buffer[0]
-        if (!nextMsg || nextMsg[0] === MType.Timestamp) {
-          ended = true
-        } else {
-          messagesBatch.push(buffer.shift() as unknown as Message)
-        }
+  flushBuffer = async ({
+    buffer,
+    throttleBatchSize = 10000,
+    throttleDelay = 10,
+  }: {
+    buffer: Message[]
+    throttleBatchSize?: number
+    throttleDelay?: number
+  }) => {
+    let ended = false
+    const messagesBatch: Message[] = [buffer.shift() as unknown as Message]
+    while (!ended) {
+      const nextMsg = buffer[0]
+      if (!nextMsg || nextMsg[0] === MType.Timestamp) {
+        ended = true
+      } else {
+        messagesBatch.push(buffer.shift() as unknown as Message)
       }
+      if (messagesBatch.length > throttleBatchSize) {
+        this.postToWorker(messagesBatch)
+        messagesBatch.length = 0
+        await delay(throttleDelay)
+      }
+    }
+    if (messagesBatch.length) {
       this.postToWorker(messagesBatch)
-      res(null)
-    })
+    }
   }
 
   onUxtCb = []
