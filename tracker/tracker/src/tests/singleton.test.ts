@@ -75,7 +75,6 @@ describe('Singleton Testing', () => {
     singleton.configure(options);
 
     methods.forEach(method => {
-      console.log(method);
       expect(singleton[method]).toBeDefined();
     });
   })

@@ -1,4 +1,4 @@
-import App from './app/index.js'
+import App from './app/index'
 
 export { default as App } from './app/index.js'
 
@@ -28,6 +28,7 @@ import Network from './modules/network.js'
 import ConstructedStyleSheets from './modules/constructedStyleSheets.js'
 import Selection from './modules/selection.js'
 import Tabs from './modules/tabs.js'
+import AnalyticsSDK from './modules/analytics/index.js'
 
 import { IN_BROWSER, deprecationWarn, DOCS_HOST, inIframe } from './utils.js'
 import FeatureFlags, { IFeatureFlag } from './modules/featureFlags.js'
@@ -107,6 +108,7 @@ export default class API {
   public featureFlags: FeatureFlags
 
   private readonly app: App | null = null
+  public readonly analytics: AnalyticsSDK | null = null
   private readonly crossdomainMode: boolean = false
 
   constructor(public readonly options: Partial<Options>) {
@@ -177,6 +179,11 @@ export default class API {
       options,
       this.signalStartIssue,
       this.crossdomainMode,
+    )
+    this.analytics = new AnalyticsSDK(
+      options.localStorage ?? localStorage,
+      options.sessionStorage ?? sessionStorage,
+      this.getAnalyticsToken,
     )
     this.app = app
     if (!this.crossdomainMode) {
@@ -526,6 +533,21 @@ export default class API {
       if (msg != null) {
         this.app.send(msg)
       }
+    }
+  }
+
+  private analyticsToken: string | null = null
+  /**
+   * Use custom token for analytics events without session recording
+   * */
+  public setAnalyticsToken = (token: string) => {
+    this.analyticsToken = token
+  }
+  public getAnalyticsToken = () => {
+    if (this.analyticsToken) {
+      return this.analyticsToken
+    } else {
+      return this.app?.session.getSessionToken() ?? ''
     }
   }
 }
