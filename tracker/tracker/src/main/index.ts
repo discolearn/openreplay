@@ -184,6 +184,8 @@ export default class API {
       options.localStorage ?? localStorage,
       options.sessionStorage ?? sessionStorage,
       this.getAnalyticsToken,
+      this.app?.timestamp ?? Date.now,
+      this.setUserID,
     )
     this.app = app
     if (!this.crossdomainMode) {
@@ -324,6 +326,9 @@ export default class API {
       if (this.app === null) {
         return Promise.reject("Browser doesn't support required api, or doNotTrack is active.")
       }
+      if (startOpts?.userID) {
+        this.analytics?.people.identify(startOpts.userID, { fromTracker: true })
+      }
       return this.app.start(startOpts)
     } else {
       return Promise.reject('Trying to start not in browser.')
@@ -459,6 +464,7 @@ export default class API {
   setUserID(id: string): void {
     if (typeof id === 'string' && this.app !== null) {
       this.app.session.setUserID(id)
+      this.analytics?.people.identify(id, { fromTracker: true })
     }
   }
 
