@@ -4,10 +4,12 @@ RUN apk add --no-cache tini
 
 ARG envarg
 ENV ENTERPRISE_BUILD=${envarg} \
-    MAXMINDDB_FILE=/home/openreplay/geoip.mmdb \
-    PRIVATE_ENDPOINTS=false \
-    LISTEN_PORT=9001 \
-    NODE_ENV=production
+  MAXMINDDB_FILE=/home/openreplay/geoip.mmdb \
+  PRIVATE_ENDPOINTS=false \
+  LISTEN_PORT=9001 \
+  MAX_RETRIES=3 \
+  RETRY_DELAY=500 \
+  NODE_ENV=production
 WORKDIR /work
 COPY package.json .
 COPY package-lock.json .
