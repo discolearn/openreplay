@@ -29,6 +29,15 @@ export function debounce(callback, wait, context = this) {
   };
 }
 
+export function debounceCall(func, wait) {
+  let timeout;
+  return function (...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+
 /* eslint-disable no-mixed-operators */
 export function randomInt(a, b) {
   const min = (b ? a : 0) - 0.5;
