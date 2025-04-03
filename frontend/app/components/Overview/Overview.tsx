@@ -11,7 +11,7 @@ import {
   newFFlag,
   fflag,
   fflagRead,
-  bookmarks,
+  bookmarks
 } from 'App/routes';
 import { withRouter, RouteComponentProps, useLocation } from 'react-router-dom';
 import FlagView from 'Components/FFlags/FlagView/FlagView';
@@ -28,15 +28,18 @@ interface IProps extends RouteComponentProps {
     };
   };
 }
+
 // TODO should move these routes to the Routes file
 function Overview({ match: { params } }: IProps) {
-  const { searchStore } = useStore();
+  const { searchStore, filterStore, projectsStore } = useStore();
   const { siteId, fflagId } = params;
   const location = useLocation();
   const tab = location.pathname.split('/')[2];
+  const { activeSiteId } = projectsStore;
 
   React.useEffect(() => {
     searchStore.setActiveTab(tab);
+    // void filterStore.fetchFilters(activeSiteId + '');
   }, [tab]);
 
   return (
@@ -68,5 +71,5 @@ function Overview({ match: { params } }: IProps) {
 }
 
 export default withPageTitle('Sessions - OpenReplay')(
-  withRouter(observer(Overview)),
+  withRouter(observer(Overview))
 );

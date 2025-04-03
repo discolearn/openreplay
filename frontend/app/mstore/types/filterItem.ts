@@ -2,59 +2,42 @@ import { FilterCategory, FilterKey, FilterType } from 'Types/filter/filterType';
 import {
   conditionalFiltersMap,
   filtersMap,
-  mobileConditionalFiltersMap,
+  mobileConditionalFiltersMap
 } from 'Types/filter/newFilter';
 import { makeAutoObservable } from 'mobx';
 
-import { pageUrlOperators } from '../../constants/filterOptions';
+import { pageUrlOperators } from '@/constants/filterOptions';
 
 export default class FilterItem {
   type: string = '';
-
   category: FilterCategory = FilterCategory.METADATA;
-
   subCategory: string = '';
-
   key: string = '';
-
   label: string = '';
-
   value: any = [''];
-
   isEvent: boolean = false;
-
   operator: string = '';
-
   hasSource: boolean = false;
-
   source: string = '';
-
   sourceOperator: string = '';
-
   sourceOperatorOptions: any = [];
-
   filters: FilterItem[] = [];
-
   operatorOptions: any[] = [];
-
   options: any[] = [];
-
   isActive: boolean = true;
-
   completed: number = 0;
-
   dropped: number = 0;
 
   constructor(
     data: any = {},
     private readonly isConditional?: boolean,
-    private readonly isMobile?: boolean,
+    private readonly isMobile?: boolean
   ) {
     makeAutoObservable(this);
 
     if (Array.isArray(data.filters)) {
       data.filters = data.filters.map(
-        (i: Record<string, any>) => new FilterItem(i),
+        (i: Record<string, any>) => new FilterItem(i)
       );
     }
 
@@ -163,7 +146,7 @@ export default class FilterItem {
       sourceOperator: this.sourceOperator,
       filters: Array.isArray(this.filters)
         ? this.filters.map((i) => i.toJson())
-        : [],
+        : []
     };
     if (this.type === FilterKey.DURATION) {
       json.value = this.value.map((i: any) => (!i ? 0 : i));

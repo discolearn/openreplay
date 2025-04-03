@@ -102,7 +102,7 @@ const HIGHLIGHTS_PATH = routes.highlights();
 let debounceSearch: any = () => {};
 
 function PrivateRoutes() {
-  const { projectsStore, userStore, integrationsStore, searchStore } = useStore();
+  const { projectsStore, userStore, integrationsStore, searchStore, filterStore } = useStore();
   const onboarding = userStore.onboarding;
   const scope = userStore.scopeState;
   const { tenantId } = userStore.account;
@@ -121,6 +121,7 @@ function PrivateRoutes() {
     if (siteId && integrationsStore.integrations.siteId !== siteId) {
       integrationsStore.integrations.setSiteId(siteId);
       void integrationsStore.integrations.fetchIntegrations(siteId);
+      void filterStore.fetchFilters(siteId)
     }
   }, [siteId]);
 

@@ -1,12 +1,13 @@
 import {
   CUSTOM_RANGE,
   DATE_RANGE_VALUES,
-  getDateRangeFromValue,
+  getDateRangeFromValue
 } from 'App/dateRange';
 import Filter, { IFilter } from 'App/mstore/types/filter';
 import FilterItem from 'App/mstore/types/filterItem';
 import { makeAutoObservable, observable } from 'mobx';
 import { LAST_24_HOURS, LAST_30_DAYS, LAST_7_DAYS } from 'Types/app/period';
+// import { Filter } from '@/mstore/types/filterConstants';
 
 // @ts-ignore
 const rangeValue = DATE_RANGE_VALUES.LAST_24_HOURS;
@@ -24,7 +25,7 @@ interface ISearch {
   userDevice?: string;
   fid0?: string;
   events: Event[];
-  filters: IFilter[];
+  filters: FilterItem[];
   minDuration?: number;
   maxDuration?: number;
   custom: Record<string, any>;
@@ -45,62 +46,36 @@ interface ISearch {
 
 export default class Search {
   name: string;
-
   searchId?: number;
-
   referrer?: string;
-
   userBrowser?: string;
-
   userOs?: string;
-
   userCountry?: string;
-
   userDevice?: string;
-
   fid0?: string;
-
   events: Event[];
-
   filters: FilterItem[];
-
   minDuration?: number;
-
   maxDuration?: number;
-
   custom: Record<string, any>;
-
   rangeValue: string;
-
   startDate: number;
-
   endDate: number;
-
   groupByUser: boolean;
-
   sort: string;
-
   order: string;
-
   viewed?: boolean;
-
   consoleLogCount?: number;
-
   eventsCount?: number;
-
   suspicious?: boolean;
-
   consoleLevel?: string;
-
   strict: boolean;
-
   eventsOrder: string;
-
   limit: number;
 
   constructor(initialData?: Partial<ISearch>) {
     makeAutoObservable(this, {
-      filters: observable,
+      filters: observable
     });
     Object.assign(this, {
       name: '',
@@ -130,7 +105,7 @@ export default class Search {
       strict: false,
       eventsOrder: 'then',
       limit: 10,
-      ...initialData,
+      ...initialData
     });
   }
 
@@ -170,13 +145,13 @@ export default class Search {
   toSearch() {
     const js: any = { ...this };
     js.filters = this.filters.map((filter: any) =>
-      new FilterItem(filter).toJson(),
+      new FilterItem(filter).toJson()
     );
 
     const { startDate, endDate } = this.getDateRange(
       js.rangeValue,
       js.startDate,
-      js.endDate,
+      js.endDate
     );
     js.startDate = startDate;
     js.endDate = endDate;
@@ -189,7 +164,7 @@ export default class Search {
   private getDateRange(
     rangeName: string,
     customStartDate: number,
-    customEndDate: number,
+    customEndDate: number
   ): {
     startDate: number;
     endDate: number;
@@ -207,7 +182,7 @@ export default class Search {
       case CUSTOM_RANGE:
         if (!customStartDate || !customEndDate) {
           throw new Error(
-            'Start date and end date must be provided for CUSTOM_RANGE.',
+            'Start date and end date must be provided for CUSTOM_RANGE.'
           );
         }
         startDate = customStartDate;
@@ -220,7 +195,7 @@ export default class Search {
 
     return {
       startDate,
-      endDate,
+      endDate
     };
   }
 
@@ -243,16 +218,17 @@ export default class Search {
       eventsOrder,
       startDate,
       endDate,
+      filters,
       // events: events.map((event: any) => new Event(event)),
-      filters: filters.map((i: any) => {
-        const filter = new Filter(i).toData();
-        if (Array.isArray(i.filters)) {
-          filter.filters = i.filters.map((f: any) =>
-            new Filter({ ...f, subFilter: i.type }).toData(),
-          );
-        }
-        return filter;
-      }),
+      // filters: filters.map((i: any) => {
+      //   const filter = new Filter(i).toData();
+      //   if (Array.isArray(i.filters)) {
+      //     filter.filters = i.filters.map((f: any) =>
+      //       new Filter({ ...f, subFilter: i.type }).toData()
+      //     );
+      //   }
+      //   return filter;
+      // })
     });
   }
 }
