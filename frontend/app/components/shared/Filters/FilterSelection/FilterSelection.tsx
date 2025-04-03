@@ -72,7 +72,7 @@ const FilterSelection: React.FC<FilterSelectionProps> = observer(({
 
   return (
     // Add a class to the wrapper if needed, e.g., for opacity when loading
-    <div className={cn('relative flex-shrink-0')}>
+    // <div className={cn('relative flex-shrink-0')}>
       <Popover
         content={content}
         trigger="click"
@@ -86,7 +86,7 @@ const FilterSelection: React.FC<FilterSelectionProps> = observer(({
       >
         {triggerElement}
       </Popover>
-    </div>
+    // </div>
   );
 });
 
