@@ -9,7 +9,7 @@ import SessionHeader from './components/SessionHeader';
 import LatestSessionsMessage from './components/LatestSessionsMessage';
 
 function SessionsTabOverview() {
-  usePageTitle('Sessions - OpenReplay');
+  // usePageTitle('Sessions - OpenReplay');
 
   return (
     <>

@@ -27,6 +27,7 @@
     "@codewonders/html2canvas": "^1.0.2",
     "@eslint/js": "^9.21.0",
     "@medv/finder": "^4.0.2",
+    "@neodrag/react": "^2.3.0",
     "@sentry/browser": "^5.21.1",
     "@svg-maps/world": "^1.0.1",
     "@tanstack/react-query": "^5.56.2",
