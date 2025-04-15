@@ -67,7 +67,7 @@ service:
     metrics: 8888
 
 ingress:
-  enabled: true
+  enabled: false
   className: "{{ .Values.global.ingress.controller.ingressClassResource.name }}"
   annotations:
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
