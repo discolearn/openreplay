@@ -49,6 +49,8 @@ spec:
               value: '{{ .Values.global.kafka.kafkaHost }}:{{ .Values.global.kafka.kafkaPort }}'
             - name: KAFKA_USE_SSL
               value: '{{ .Values.global.kafka.kafkaUseSsl }}'
+            - name: ASSIST_KEY
+              value: {{ .Values.global.assistKey }}
             - name: pg_password
               {{- if .Values.global.postgresql.existingSecret }}
               valueFrom:
