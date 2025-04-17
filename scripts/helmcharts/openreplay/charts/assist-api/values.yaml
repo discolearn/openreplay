@@ -97,9 +97,6 @@ autoscaling:
   # targetMemoryUtilizationPercentage: 80
 
 env:
-  debug: 0
-  uws: false
-  redis: false
   CLEAR_SOCKET_TIME: 720
 
 
