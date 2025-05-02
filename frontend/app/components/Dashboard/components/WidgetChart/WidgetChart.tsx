@@ -4,7 +4,7 @@ import BarChart from 'App/components/Charts/BarChart';
 import PieChart from 'App/components/Charts/PieChart';
 import ColumnChart from 'App/components/Charts/ColumnChart';
 import SankeyChart from 'Components/Charts/SankeyChart';
-
+import SunBurstChart from 'Components/Charts/SunburstChart/Sunburst'
 import CustomMetricPercentage from 'App/components/Dashboard/Widgets/CustomMetricsWidgets/CustomMetricPercentage';
 import { Styles } from 'App/components/Dashboard/Widgets/common';
 import { observer } from 'mobx-react-lite';
@@ -530,7 +530,17 @@ function WidgetChart(props: Props) {
         : false;
       const height = props.isPreview ? 550 : 240;
       return (
-        <SankeyChart
+        <div>
+          <SankeyChart
+            height={height}
+            data={data}
+            inGrid={!props.isPreview}
+            onChartClick={(filters: any) => {
+              dashboardStore.drillDownFilter.merge({ filters, page: 1 });
+            }}
+            isUngrouped={isUngrouped}
+          />
+        <SunBurstChart
           height={height}
           data={data}
           inGrid={!props.isPreview}
@@ -539,7 +549,8 @@ function WidgetChart(props: Props) {
           }}
           isUngrouped={isUngrouped}
         />
-      );
+        </div>
+      )
     }
 
     if (metricType === RETENTION) {
