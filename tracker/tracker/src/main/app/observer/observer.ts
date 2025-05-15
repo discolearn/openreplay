@@ -393,6 +393,7 @@ export default abstract class Observer {
             this.inlinerOptions?.forceFetch,
             this.inlinerOptions?.forcePlain,
             (cssText: string, fakeTextId: number) => {
+              console.log('fakeTextId', fakeTextId, id, cssText)
               this.app.send(CreateTextNode(fakeTextId, id, 0))
               setTimeout(() => {
                 this.app.send(SetCSSDataURLBased(fakeTextId, cssText, this.app.getBaseHref()))
