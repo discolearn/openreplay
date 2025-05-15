@@ -375,7 +375,7 @@ export default abstract class Observer {
       return
     }
     if (name === 'style' || (name === 'href' && hasTag(node, 'link'))) {
-      console.log('rel' in node, node.rel === 'stylesheet', this.inlineRemoteCss, this.inlinerOptions)
+      console.log('rel' in node, node.rel, this.inlineRemoteCss, this.inlinerOptions)
       if ('rel' in node && node.rel === 'stylesheet' && this.inlineRemoteCss) {
         setTimeout(() => {
           inlineRemoteCss(
