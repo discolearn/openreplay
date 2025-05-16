@@ -80,7 +80,7 @@ func (c *Consumer) ConsumeNext() error {
 		Consumer: c.group,
 		Streams:  c.streams,
 		Count:    int64(READ_COUNT),
-		Block:    200 * time.Millisecond,
+		Block:    2000 * time.Millisecond,
 	}).Result()
 	if err != nil {
 		if err, ok := err.(net.Error); ok && err.Timeout() {
