@@ -770,6 +770,13 @@ export default class App {
             this.debug.error('Openreplay compression error:', err)
             this.worker?.postMessage({ type: 'uncompressed', batch: batch })
           } else {
+            this.debug.info(
+              'OpenReplay: compressed batch size',
+              batchSize,
+              '->',
+              result.byteLength,
+              'bytes',
+            )
             this.worker?.postMessage({ type: 'compressed', batch: result })
           }
         })
