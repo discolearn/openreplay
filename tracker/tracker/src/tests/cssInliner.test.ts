@@ -131,7 +131,7 @@ describe('inlineRemoteCss', () => {
       123, 'body { color: red; }', 0, 'http://example.com'
     );
     expect(mockAdoptedSSInsertRuleURLBased).toHaveBeenCalledWith(
-      123, '.class { background: blue; }', 1, 'http://example.com'
+      123, '.class { background-color: blue; background-image: none; background-repeat: repeat; background-attachment: scroll; background-position: 0% 0%; background-size: auto; background-origin: padding-box; background-clip: border-box; }', 1, 'http://example.com'
     );
     expect(mockAdoptedSSInsertRuleURLBased).toHaveBeenCalledWith(
       123, '@media (max-width: 600px) { body { font-size: 14px; } }', 2, 'http://example.com'
@@ -161,7 +161,7 @@ describe('inlineRemoteCss', () => {
       123, 'body { color: red; }', 0, 'http://example.com'
     );
     expect(mockAdoptedSSInsertRuleURLBased).toHaveBeenCalledWith(
-      123, '.class { background: blue; }', 1, 'http://example.com'
+      123, '.class { background-color: blue; background-image: none; background-repeat: repeat; background-attachment: scroll; background-position: 0% 0%; background-size: auto; background-origin: padding-box; background-clip: border-box; }', 1, 'http://example.com'
     );
   });
 
@@ -235,7 +235,7 @@ describe('inlineRemoteCss', () => {
     );
     expect(mockAdoptedSSInsertRuleURLBased).toHaveBeenCalledWith(
       123,
-      '.container {\n        padding: 20px;\n      }',
+      '.container {\n        padding-top: 20px; padding-right: 20px; padding-bottom: 20px; padding-left: 20px;\n      }',
       1,
       'http://example.com'
     );
