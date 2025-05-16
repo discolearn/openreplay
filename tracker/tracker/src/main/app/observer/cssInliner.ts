@@ -344,17 +344,6 @@ const shorthandMap: Record<string, string[]> = {
   outline: ['outline-width', 'outline-style', 'outline-color'],
 }
 
-const defaultValues: Record<string, string> = {
-  'background-color': 'transparent',
-  'background-image': 'none',
-  'background-repeat': 'repeat',
-  'background-attachment': 'scroll',
-  'background-position': '0% 0%',
-  'background-size': 'auto',
-  'background-origin': 'padding-box',
-  'background-clip': 'border-box',
-}
-
 const expandShorthand = (declaration: string): string => {
   for (const [shorthand, longhandProps] of Object.entries(shorthandMap)) {
     const regex = new RegExp(`${shorthand}\\s*:\\s*([^;]+)`, 'g')
@@ -367,7 +356,7 @@ const expandShorthand = (declaration: string): string => {
       ) {
         return `background-color: ${value}; ${longhandProps
           .slice(1)
-          .map((prop) => `${prop}: ${defaultValues[prop] || 'initial'}`)
+          .map((prop) => `${prop}: initial`)
           .join('; ')}`
       }
 
