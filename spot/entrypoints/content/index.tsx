@@ -340,11 +340,14 @@ export default defineContentScript({
         });
     }
 
-    setInterval(() => {
-      void browser.runtime.sendMessage({ type: messages.content.from.contentReady });
+    const pingInt = setInterval(() => {
+      try {
+        void browser.runtime.sendMessage({ type: messages.content.from.contentReady });
+      } catch (_) {}
     }, 250);
     // @ts-ignore false positive
     browser.runtime.onMessage.addListener((message: any, resp) => {
+      clearInterval(pingInt);
       if (message.type === messages.content.to.mount) {
         if (recState === "count") return;
         recState = "count";
