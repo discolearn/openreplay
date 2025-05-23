@@ -125,7 +125,16 @@ class ScreenRecorder {
 
     this.mRecorder.ondataavailable = this._handleDataAvailable;
     this.mRecorder.onstop = this._handleStop;
-
+    // check how's steam doing and video size
+    let checks = 0;
+    const int = setInterval(() => {
+      if (checks < 50) {
+        checks++;
+        console.log(this.mRecorder.state, this.mRecorder.stream.active);
+      } else {
+        clearInterval(int);
+      }
+    }, 500)
     this.mRecorder.start();
     this.isRecording = true;
     this.trackDuration();
@@ -226,16 +235,23 @@ class ScreenRecorder {
       throw e;
     }
     try {
-      microphoneStream = await navigator.mediaDevices.getUserMedia({
-        audio: { echoCancellation: false, deviceId: audioId },
+      const hasAudioPerms = await navigator.permissions.query({
+        name: "microphone",
       });
-      this.audioTrack = microphoneStream.getAudioTracks()[0];
+      if (hasAudioPerms.state === "denied") {
+        useMicrophone = false;
+      }
       if (!useMicrophone) {
+        this.audioTrack = this.createPlaceholderAudioTrack();
         this.audioTrack.enabled = false;
+      } else {
+        microphoneStream = await navigator.mediaDevices.getUserMedia({
+          audio: { echoCancellation: false, deviceId: audioId },
+        });
+        this.audioTrack = microphoneStream.getAudioTracks()[0];
       }
     } catch (e) {
       console.error('get audio error', e);
-      this.audioTrack = this.createPlaceholderAudioTrack();
     }
 
     const existingAudioTracks = this.videoStream.getAudioTracks();

@@ -4,15 +4,18 @@ import {
   getFinalRequests,
   stopTrackingNetwork,
 } from "~/utils/networkTracking";
-import { mergeRequests, SpotNetworkRequest } from "~/utils/networkTrackingUtils";
-import { safeApiUrl } from '~/utils/smallUtils'
+import {
+  mergeRequests,
+  SpotNetworkRequest,
+} from "~/utils/networkTrackingUtils";
+import { safeApiUrl } from "~/utils/smallUtils";
 import {
   attachDebuggerToTab,
   stopDebugger,
   getRequests as getDebuggerRequests,
   resetMap,
 } from "~/utils/networkDebuggerTracking";
-import { messages } from '~/utils/messages'
+import { messages } from "~/utils/messages";
 
 let checkBusy = false;
 
@@ -97,13 +100,13 @@ export default defineBackground(() => {
     area: string | null;
     recording: string;
     audioPerm: number;
-  }
+  };
   let recordingState: recState = {
     activeTabId: null,
     area: null,
     recording: REC_STATE.stopped,
     audioPerm: 0,
-  }
+  };
   let jwtToken = "";
   let refreshInt: any;
   let pingInt: any;
@@ -339,16 +342,18 @@ export default defineBackground(() => {
       if (settings.networkLogs) {
         if (settings.useDebugger) {
           resetMap();
-          browser.tabs.query({
-            active: true,
-            currentWindow: true,
-          }).then((tabs) => {
-            if (tabs.length === 0) {
-              return console.error("No active tab found");
-            }
-            recordingState.activeTabId = tabs[0].id;
-            void attachDebuggerToTab(recordingState.activeTabId)
-          })
+          browser.tabs
+            .query({
+              active: true,
+              currentWindow: true,
+            })
+            .then((tabs) => {
+              if (tabs.length === 0) {
+                return console.error("No active tab found");
+              }
+              recordingState.activeTabId = tabs[0].id;
+              void attachDebuggerToTab(recordingState.activeTabId);
+            });
         } else {
           startTrackingNetwork();
         }
@@ -401,7 +406,7 @@ export default defineBackground(() => {
           activeTabId: null,
           area: "desktop",
           recording: REC_STATE.recording,
-          audioPerm: recordingState.audioPerm
+          audioPerm: recordingState.audioPerm,
         };
         startRecording(
           recArea,
@@ -490,7 +495,9 @@ export default defineBackground(() => {
         }
       });
       if (request.ingest) {
-        const updatedSettings = Object.assign(settings, { ingestPoint: request.ingest });
+        const updatedSettings = Object.assign(settings, {
+          ingestPoint: request.ingest,
+        });
         settings = updatedSettings;
         void browser.storage.local.set({ settings: updatedSettings });
       }
@@ -594,7 +601,7 @@ export default defineBackground(() => {
         activeTabId: null,
         area: null,
         recording: REC_STATE.stopped,
-        audioPerm: recordingState.audioPerm
+        audioPerm: recordingState.audioPerm,
       };
     }
     if (request.type === messages.content.from.restart) {
@@ -652,13 +659,12 @@ export default defineBackground(() => {
           mappedNetwork = getDebuggerRequests();
         } else {
           networkRequests = getFinalRequests(
-            recordingState.area === 'tab' ? recordingState.activeTabId! : undefined,
+            recordingState.area === "tab"
+              ? recordingState.activeTabId!
+              : undefined,
           );
           stopTrackingNetwork();
-          mappedNetwork = mergeRequests(
-            networkRequests,
-            injectNetworkRequests,
-          );
+          mappedNetwork = mergeRequests(networkRequests, injectNetworkRequests);
         }
       }
       injectNetworkRequests = [];
@@ -856,7 +862,7 @@ export default defineBackground(() => {
                     activeTabId: null,
                     area: null,
                     recording: REC_STATE.stopped,
-                    audioPerm: recordingState.audioPerm
+                    audioPerm: recordingState.audioPerm,
                   };
                   // id of spot, mobURL - for events, videoURL - for video
                   if (!resp || !resp.id) {
@@ -935,6 +941,7 @@ export default defineBackground(() => {
 
   void browser.runtime.setUninstallURL("https://forms.gle/sMo8da2AvrPg5o7YA");
   browser.runtime.onInstalled.addListener(async ({ reason }) => {
+    await void initializeOffscreenDocument();
     // Also fired on update and browser_update
     if (reason === "install") {
       await browser.tabs.create({
@@ -946,22 +953,25 @@ export default defineBackground(() => {
       if (tab.url?.match(/(chrome|chrome-extension):\/\//gi) || !tab.id) {
         continue;
       }
-      const res = await browser.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ["/content-scripts/content.js"],
-      });
-      console.log('restoring content at', res)
+      try {
+        const res = await chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["/content-scripts/content.js"],
+        });
+        console.log("restoring content at", res);
+      } catch (e) {
+        console.error("Error restoring content script", e);
+      }
     }
     await checkTokenValidity();
-    void initializeOffscreenDocument();
   });
-  void initializeOffscreenDocument();
 
   async function initializeOffscreenDocument() {
     const existingContexts = await browser.runtime.getContexts({
-      contextTypes: ["OFFSCREEN_DOCUMENT"],
+      contextTypes: [browser.runtime.ContextType.OFFSCREEN_DOCUMENT],
     });
 
+    if (existingContexts.length) return;
     const offscreenDocument = existingContexts.find(
       (c: { contextType: string }) => c.contextType === "OFFSCREEN_DOCUMENT",
     );
@@ -976,21 +986,24 @@ export default defineBackground(() => {
     try {
       await browser.offscreen.createDocument({
         url: "offscreen.html",
-        reasons: ["DISPLAY_MEDIA", "USER_MEDIA", "BLOBS"],
+        reasons: ["USER_MEDIA"],
         justification: "Recording from chrome.tabCapture API",
       });
     } catch (e) {
-      console.error("cant create new offscreen document", e);
+      console.error("Spot: cant create new offscreen document", e);
     }
 
     return;
   }
-  async function sendToActiveTab(message: {
-    type: string;
-    data?: any;
-    activeTabId?: number;
-    [key: string]: any;
-  }, onSent?: (tabId: number) => void) {
+  async function sendToActiveTab(
+    message: {
+      type: string;
+      data?: any;
+      activeTabId?: number;
+      [key: string]: any;
+    },
+    onSent?: (tabId: number) => void,
+  ) {
     let activeTabs = await browser.tabs.query({
       active: true,
       currentWindow: true,
@@ -1081,7 +1094,7 @@ export default defineBackground(() => {
           activeTabId: null,
           area: null,
           recording: REC_STATE.stopped,
-          audioPerm: recordingState.audioPerm
+          audioPerm: recordingState.audioPerm,
         };
         void sendToActiveTab({
           type: messages.content.to.unmount,
@@ -1128,8 +1141,8 @@ export default defineBackground(() => {
                 state: getRecState(),
                 activeTabId: null,
               };
-              console.log(tabId, 'activation for new')
-              attachDebuggerToTab(tabId)
+              console.log(tabId, "activation for new");
+              attachDebuggerToTab(tabId);
               void sendToActiveTab(msg);
             });
           if (previousTab) {
@@ -1200,7 +1213,7 @@ export default defineBackground(() => {
             activeTabId: null,
             area: null,
             recording: REC_STATE.stopped,
-            audioPerm: recordingState.audioPerm
+            audioPerm: recordingState.audioPerm,
           };
         }
       }
