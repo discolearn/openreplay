@@ -55,6 +55,9 @@ export default defineContentScript({
       },
     });
     ctx.onInvalidated(() => {
+      window.removeEventListener("message", msgListener);
+      unmountNotifications();
+      injected = false;
       ui.remove();
     });
     let micResponse: boolean | null = null;
@@ -237,7 +240,7 @@ export default defineContentScript({
       }
     };
 
-    window.addEventListener("message", (event) => {
+    function msgListener(event: MessageEvent) {
       if (event.data.type === "orspot:ping") {
         window.postMessage({ type: "orspot:pong" }, "*");
       }
@@ -267,7 +270,8 @@ export default defineContentScript({
           event: event.data.event,
         });
       }
-    });
+    }
+    window.addEventListener("message", msgListener);
 
     let injected = false;
     function injectScript() {
@@ -309,14 +313,19 @@ export default defineContentScript({
       ui.remove();
     }
 
+    let scriptEl: HTMLScriptElement | null = null;
     function mountNotifications() {
-      const scriptEl = document.createElement("script");
+      scriptEl = document.createElement("script");
       scriptEl.src = browser.runtime.getURL("/notifications.js");
       document.head.appendChild(scriptEl);
     }
 
     function unmountNotifications() {
       window.postMessage({ type: "ornotif:stop" });
+      if (scriptEl) {
+        document.head.removeChild(scriptEl);
+        scriptEl = null;
+      }
     }
 
     mountNotifications();

@@ -29,6 +29,7 @@ export default defineConfig({
       "webNavigation",
       "webRequest",
       "debugger",
+      "scripting",
     ],
   },
   webExt: {
