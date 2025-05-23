@@ -48,11 +48,18 @@ export default function (app: App, opts: CssRulesOptions) {
 
   function checkRuleChanges() {
     if (!options.scanInMemoryCSS) return
-    const allSheets = trackedSheets.values()
-    for (const sheet of allSheets) {
+
+    // Track which sheet IDs are still active
+    const activeSheetIDs = new Set()
+    
+    for (let i = 0; i < document.styleSheets.length; i++) {
+      const sheet = document.styleSheets[i]
       try {
         const sheetID = styleSheetIDMap.get(sheet)
-        if (!sheetID) continue
+        if (!sheetID || !trackedSheets.has(sheet)) continue
+        
+        activeSheetIDs.add(sheetID)
+
         if (options.checkLimit) {
           if (!checkIterations[sheetID]) {
             checkIterations[sheetID] = 0
@@ -87,13 +94,11 @@ export default function (app: App, opts: CssRulesOptions) {
           }
         }
 
-        const keysToCheck = Array.from(ruleSnapshots.keys()).filter((key) =>
-          key.startsWith(`${sheetID}:`),
-        )
-
-        for (const key of keysToCheck) {
-          const index = parseInt(key.split(':')[1], 10)
-          if (index >= sheet.cssRules.length) {
+        // Clean up entries for completely removed stylesheets
+        const allKeys = Array.from(ruleSnapshots.keys())
+        for (const key of allKeys) {
+          const sheetID = key.split(':')[0]
+          if (!activeSheetIDs.has(sheetID)) {
             ruleSnapshots.delete(key)
           }
         }
