@@ -42,24 +42,17 @@ export default function (app: App, opts: CssRulesOptions) {
   //  sheetID:index -> ruleText
   const ruleSnapshots = new Map<string, string>()
   let checkInterval: number | null = null
-  const trackedSheets: Set<CSSStyleSheet> = new Set();
+  const trackedSheets: Set<CSSStyleSheet> = new Set()
   const checkIntervalMs = options.checkCssInterval || 200
   let checkIterations: Record<number, number> = {}
 
   function checkRuleChanges() {
     if (!options.scanInMemoryCSS) return
-
-    // Track which sheet IDs are still active
-    const activeSheetIDs = new Set()
-    
-    for (let i = 0; i < document.styleSheets.length; i++) {
-      const sheet = document.styleSheets[i]
+    const allSheets = trackedSheets.values()
+    for (const sheet of allSheets) {
       try {
         const sheetID = styleSheetIDMap.get(sheet)
-        if (!sheetID || !trackedSheets.has(sheet)) continue
-        
-        activeSheetIDs.add(sheetID)
-
+        if (!sheetID) continue
         if (options.checkLimit) {
           if (!checkIterations[sheetID]) {
             checkIterations[sheetID] = 0
@@ -94,11 +87,13 @@ export default function (app: App, opts: CssRulesOptions) {
           }
         }
 
-        // Clean up entries for completely removed stylesheets
-        const allKeys = Array.from(ruleSnapshots.keys())
-        for (const key of allKeys) {
-          const sheetID = key.split(':')[0]
-          if (!activeSheetIDs.has(sheetID)) {
+        const keysToCheck = Array.from(ruleSnapshots.keys()).filter((key) =>
+          key.startsWith(`${sheetID}:`),
+        )
+
+        for (const key of keysToCheck) {
+          const index = parseInt(key.split(':')[1], 10)
+          if (index >= sheet.cssRules.length) {
             ruleSnapshots.delete(key)
           }
         }
